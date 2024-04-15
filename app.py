@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
@@ -12,12 +13,10 @@ client = WebClient(
 
 try:
     x = dt.datetime.now()
-    tmp = dt.datetime(2024, 4, 8, 15, 27, 4, 517207)
-    x.weekday()
-    today_meal = get_weekly_dreamtower_meal(tmp.weekday())
+    print(x)
+    today_meal = get_weekly_dreamtower_meal(x.weekday())
     if today_meal:
-        response = client.chat_postMessage(channel = "C06U0QC2TGE", text=f'>*📅{today_meal["date"]}{today_meal["day"]}*\n>*점심 🥗*\n{today_meal["lunch"]}')
-        response = client.chat_postMessage(channel = "C06U0QC2TGE", text=f'>*저녁🍲*\n{today_meal["dinner"]}')
+        response = client.chat_postMessage(channel = "C06U0QC2TGE", text=f'>*📅{today_meal["date"]}{today_meal["day"]}*\n>*점심 🥗*\n{today_meal["lunch"]}\n>*저녁🍲*\n{today_meal["dinner"]}')
 
 except SlackApiError as err:
-    print(f"Error:{err.response["error"]}")
+    print(f"Error:{err.response['error']}")

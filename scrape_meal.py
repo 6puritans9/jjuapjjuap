@@ -31,7 +31,7 @@ def parse_meal(lunch, dinner) -> dict:
 
 
 def get_weekly_dreamtower_meal(weekly):
-    url = "https://dorm.kyonggi.ac.kr:446/Khostel/mall_main.php?viewform=B0001_foodboard_list&gyear=2024&gmonth=04&gday=07"
+    url = "https://dorm.kyonggi.ac.kr:446/Khostel/mall_main.php?viewform=B0001_foodboard_list&board_no=1"
 
     response = requests.get(url)
     print("응답코드: ", response.status_code)
