@@ -1,22 +1,57 @@
 #!/usr/bin/env python3
 import os
+import datetime as dt
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
 from dotenv import load_dotenv
 from scrape_meal import get_weekly_dreamtower_meal
-import datetime as dt
+
+# Load environment variables
 load_dotenv()
-SECRET_ENV = os.getenv("SECRET_ENV")
-client = WebClient(
-    token=f"{SECRET_ENV}"
-)
+SLACK_TOKEN = os.getenv("SECRET_ENV")
+DEFAULT_CHANNEL_ID = os.getenv("DEFAULT_CHANNEL_ID")  # Default fallback channel
 
-try:
-    x = dt.datetime.now()
-    print(x)
-    today_meal = get_weekly_dreamtower_meal(x.weekday())
-    if today_meal:
-        response = client.chat_postMessage(channel = "C06U0QC2TGE", text=f'>*📅{today_meal["date"]}{today_meal["day"]}*\n>*점심 🥗*\n{today_meal["lunch"]}\n>*저녁🍲*\n{today_meal["dinner"]}')
+# Initialize the Slack client
+client = WebClient(token=SLACK_TOKEN)
 
-except SlackApiError as err:
-    print(f"Error:{err.response['error']}")
+
+def get_channels():
+    result = client.conversations_list()
+    channels = result["channels"]
+    valid_channel = []
+    for channel in channels:
+        if channel["is_member"]:
+            valid_channel.append(channel)
+    return valid_channel
+
+
+def post_meal_to_channel(channels_list):
+    try:
+        # Get the current date and time
+        current_time = dt.datetime.now()
+        print(current_time)
+
+        # Scrape the meal information based on the current weekday
+        today_meal = get_weekly_dreamtower_meal(current_time.weekday())
+        if today_meal:
+            # Post the meal information to the specified Slack channel
+            for each_channel in channels_list:
+                response = client.chat_postMessage(
+                    channel=each_channel["id"],
+                    text=f'>*📅{today_meal["date"]}{today_meal["day"]}*\n>*점심*\n{today_meal["lunch"]}\n>*저녁*\n{today_meal["dinner"]}',
+                )
+            print(f"Message posted successfully: {response}")
+
+        else:
+            print("No meal information available for today.")
+
+    except SlackApiError as err:
+        # Handle errors from the Slack API
+        # print(f"Error posting to Slack: {err.response['error']}")
+        print(f"Error posting to Slack: {err.response}")
+
+
+# Call the function with the default or specified channel ID
+if __name__ == "__main__":
+    channels = get_channels()
+    post_meal_to_channel(channels)
