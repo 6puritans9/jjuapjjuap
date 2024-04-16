@@ -6,7 +6,7 @@
 
 ## from Krafton Jungle🦎
 
-### 5기 1반 Tiny Project
+### 5기 1강의실 Tiny Project
 
 Forked from [**정글밥**](https://github.com/yunnn426/junglebob)
 
@@ -43,5 +43,5 @@ BeautifulSoup4
 
 ## 피드백
 
-**Slack**  
+**Slack us Anytime!**  
 김현수(5기-35) or 이규홍(5기-45)
