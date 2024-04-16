@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 import os
 import datetime as dt
+from dotenv import load_dotenv
 from slack_sdk import WebClient
 from slack_sdk.errors import SlackApiError
-from dotenv import load_dotenv
-from scrape_meal import get_weekly_dreamtower_meal
+from scraper import get_weekly_dreamtower_meal
 
-# Load environment variables
 load_dotenv()
 SLACK_TOKEN = os.getenv("SECRET_ENV")
 DEFAULT_CHANNEL_ID = os.getenv("DEFAULT_CHANNEL_ID")  # Default fallback channel
 
-# Initialize the Slack client
 client = WebClient(token=SLACK_TOKEN)
 
 
@@ -27,11 +25,9 @@ def get_channels():
 
 def post_meal_to_channel(channels_list):
     try:
-        # Get the current date and time
         current_time = dt.datetime.now()
         print(current_time)
 
-        # Scrape the meal information based on the current weekday
         today_meal = get_weekly_dreamtower_meal(current_time.weekday())
         if today_meal:
             # Post the meal information to the specified Slack channel
@@ -40,18 +36,13 @@ def post_meal_to_channel(channels_list):
                     channel=each_channel["id"],
                     text=f'>*📅{today_meal["date"]}{today_meal["day"]}*\n>*점심*\n{today_meal["lunch"]}\n>*저녁*\n{today_meal["dinner"]}',
                 )
-            print(f"Message posted successfully: {response}")
-
         else:
-            print("No meal information available for today.")
+            return
 
     except SlackApiError as err:
-        # Handle errors from the Slack API
-        # print(f"Error posting to Slack: {err.response['error']}")
-        print(f"Error posting to Slack: {err.response}")
+        print(f"Houston, we have a problem: {err}")
 
 
-# Call the function with the default or specified channel ID
 if __name__ == "__main__":
     channels = get_channels()
     post_meal_to_channel(channels)
